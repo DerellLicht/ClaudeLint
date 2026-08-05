@@ -88,14 +88,21 @@ def run_make_dry_run(directory: Path, make_cmd: str) -> str:
     return result.stdout
 
 
-def extract_compile_commands(dry_run_output: str, known_compilers: set[str]) -> dict[str, list[str]]:
-    """Scan `make -Bn` output for lines invoking one of the project's
-    known compiler executables, and pull out {source_file: raw_tokens}.
+def extract_compile_commands(dry_run_output: str) -> dict[str, list[str]]:
+    """Scan `make -Bn` output for compile-command lines, and pull out
+    {source_file: raw_tokens}.
 
-    The source file is identified as the token ending in a recognized
-    source extension -- this naturally excludes -o's output file (which
-    ends in .o/.obj, not .c/.cpp), without needing to track flag/value
-    pairing across the whole line."""
+    Deliberately does NOT filter by "does tokens[0] match a compiler
+    path already in compile_commands.json" -- that assumption breaks
+    whenever compile_commands.json is intentionally pointed at a
+    DIFFERENT compiler than the Makefile actually uses (e.g. a
+    clang-tidy-friendly compiler substituted in for header-resolution
+    reasons, per §4.1.1's "deliberately hand-tuned compiler-path entry"
+    carve-out). Instead, a line is recognized as a compile command
+    purely structurally: it contains -c, and exactly one token ends in
+    a recognized source extension. A link line has zero such tokens
+    (only .o/.exe), so this discriminates cleanly without needing to
+    know the compiler's identity up front."""
     found: dict[str, list[str]] = {}
     for line in dry_run_output.splitlines():
         stripped = line.strip()
@@ -105,7 +112,7 @@ def extract_compile_commands(dry_run_output: str, known_compilers: set[str]) -> 
             tokens = shlex.split(stripped)
         except ValueError:
             continue  # unbalanced quotes etc -- not a compile line we can parse
-        if not tokens or tokens[0] not in known_compilers:
+        if not tokens or "-c" not in tokens:
             continue
         source_tokens = [
             t for t in tokens[1:]
@@ -183,7 +190,13 @@ def main() -> None:
     ap.add_argument("--compile-commands", default="compile_commands.json")
     ap.add_argument("--directory", help="where to run `make -Bn` (default: "
                      "the \"directory\" field of the first JSON entry)")
-    ap.add_argument("--make-cmd", default="make")
+    ap.add_argument("--make-cmd", default="make",
+                     help="the make executable to invoke (default: 'make'). "
+                          "Change this if 'make' isn't what actually runs "
+                          "your build -- e.g. 'mingw32-make' for a MinGW "
+                          "toolchain that doesn't provide a plain 'make' on "
+                          "PATH, or 'gmake' on some Unix systems where "
+                          "'make' is a different (often BSD) implementation.")
     args = ap.parse_args()
 
     cc_path = Path(args.compile_commands)
@@ -204,17 +217,16 @@ def main() -> None:
 
     directory = Path(args.directory) if args.directory else Path(entries[0]["directory"])
     json_by_file = {e["file"]: e for e in entries}
-    known_compilers = {e["arguments"][0] for e in entries}
 
     print(f"Running '{args.make_cmd} -B -n' in {directory} ...")
     dry_run_output = run_make_dry_run(directory, args.make_cmd)
-    makefile_by_file = extract_compile_commands(dry_run_output, known_compilers)
+    makefile_by_file = extract_compile_commands(dry_run_output)
 
     if not makefile_by_file:
         sys.exit(
             "No compile commands recognized in `make -Bn` output. "
-            "Check --make-cmd, or that known compiler paths in "
-            "compile_commands.json still match the Makefile."
+            "Check --make-cmd, or that recipe lines actually use -c and "
+            "a recognized source extension (.c/.cpp/.cc/.cxx)."
         )
 
     problems: list[str] = []
