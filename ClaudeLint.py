@@ -125,13 +125,50 @@ def query_compiler_isystem_dirs(compiler_exe: str, extra_args: list[str]) -> lis
     return [ln.strip().split(" (")[0] for ln in section.splitlines() if ln.strip()]
 
 
-def build_parse_args(entry: dict, target: str, libclang_path: str | None,
-                      isystem_cache: dict | None = None) -> list[str]:
-    clang_args = clean_args(entry["arguments"], entry["file"])
-    if target:
-        clang_args = [f"--target={target}"] + clang_args
+def query_compiler_target(compiler_exe: str) -> str | None:
+    """Ask the REAL compiler for its own target triple via -dumpmachine,
+    instead of assuming one global --target for every entry in
+    compile_commands.json. Same "ask the tool that actually knows"
+    principle as query_compiler_isystem_dirs above -- a project can mix
+    32-bit and 64-bit (or otherwise differently-targeted) compilers
+    across its compile_commands.json entries, and a single hardcoded
+    triple silently mis-parses whichever ones don't match it (e.g. a
+    32-bit TU parsed as 64-bit loses/renames Windows API symbols that
+    are gated on _WIN64, producing spurious "undeclared identifier"
+    diagnostics that have nothing to do with the actual source)."""
+    try:
+        result = subprocess.run(
+            [compiler_exe, "-dumpmachine"], capture_output=True, text=True, timeout=30
+        )
+    except FileNotFoundError:
+        return None
+    triple = result.stdout.strip()
+    return triple or None
 
+
+def build_parse_args(entry: dict, target: str | None, libclang_path: str | None,
+                      isystem_cache: dict | None = None,
+                      target_cache: dict | None = None) -> list[str]:
+    clang_args = clean_args(entry["arguments"], entry["file"])
     compiler_exe = entry["arguments"][0]
+
+    # Explicit --target always wins (escape hatch for anything the
+    # -dumpmachine query gets wrong). Otherwise, resolve per-compiler,
+    # since different entries may legitimately use different compilers
+    # (e.g. a 32-bit tdm32 g++ and a 64-bit mingw clang++ in the same
+    # compile_commands.json).
+    resolved_target = target
+    if not resolved_target:
+        if target_cache is not None and compiler_exe in target_cache:
+            resolved_target = target_cache[compiler_exe]
+        else:
+            resolved_target = query_compiler_target(compiler_exe)
+            if target_cache is not None:
+                target_cache[compiler_exe] = resolved_target
+
+    if resolved_target:
+        clang_args = [f"--target={resolved_target}"] + clang_args
+
     query_args = defines_and_includes(entry["arguments"])
     cache_key = (compiler_exe, tuple(query_args))
 
@@ -448,7 +485,14 @@ def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--compile-commands", default="compile_commands.json")
     ap.add_argument("--libclang-path", default=r"D:\clang-22.1.8\bin\libclang.dll")
-    ap.add_argument("--target", default="x86_64-w64-mingw32")
+    ap.add_argument("--target", default=None,
+                     help="force this target triple for EVERY compile_commands.json "
+                          "entry, overriding auto-detection. Default: auto-detect "
+                          "per entry by running that entry's own compiler with "
+                          "-dumpmachine, so mixed 32-/64-bit (or otherwise mixed) "
+                          "toolchains across entries resolve independently and "
+                          "correctly. Only pass this if auto-detection is wrong "
+                          "for your setup.")
     ap.add_argument("--makefile", default="Makefile")
     ap.add_argument("--exclude", action="append", default=[],
                      help="path (dir prefix or fnmatch glob) to exclude from "
@@ -517,9 +561,11 @@ def main() -> None:
     # process -- this is where the single (now cached) -E -v compiler
     # query happens, so it only runs once total regardless of --jobs.
     isystem_cache: dict = {}
+    target_cache: dict = {}
     tasks = []
     for entry in entries:
-        parse_args = build_parse_args(entry, args.target, args.libclang_path, isystem_cache)
+        parse_args = build_parse_args(entry, args.target, args.libclang_path,
+                                       isystem_cache, target_cache)
         project_include_dirs |= {a for a in entry["arguments"] if a.startswith("-I")}
         tasks.append({
             "entry": entry,
@@ -528,6 +574,13 @@ def main() -> None:
             "exclude": args.exclude,
             "libclang_path": args.libclang_path,
         })
+
+    if args.target:
+        print(f"  target (forced via --target): {args.target}")
+    elif target_cache:
+        print("  target (auto-detected via -dumpmachine):")
+        for compiler_exe, triple in target_cache.items():
+            print(f"    {compiler_exe} -> {triple or '(unknown -- no --target applied)'}")
 
     import concurrent.futures
     import os as _os
