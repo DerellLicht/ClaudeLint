@@ -1,6 +1,6 @@
 # ClaudeLint
 
-A whole-program, cross-translation-unit linter for one specific, stubborn
+A python-based whole-program, cross-translation-unit linter for one specific, stubborn
 gap: **unused struct/class fields and unused global/file-scope variables
 in C/C++ projects.**
 
