@@ -4,6 +4,18 @@ ClaudeLint -- unused struct-field/global/local-variable linter for C/C++
 projects, per unused-symbol-linter-spec-V0.4. Grew out of, and now
 supersedes, phase2_harvest.py.
 
+§0 Staleness gate (formerly the standalone check_compile_commands_stale.py,
+now folded in as an unconditional first step -- see spec §4.1.1): before
+touching libclang at all, runs `make -B -n` and diffs it against
+compile_commands.json (missing entries, stale entries, drifted flags),
+same as the directory-field check that already lived here. On any
+mismatch, prints the problem(s) and exits before any parsing begins --
+compile_commands.json is still never written/regenerated automatically
+either way. check_compile_commands_stale.py itself is unaffected and
+still works standalone; this is a superset, not a replacement of it.
+Use --skip-stale-check to bypass (e.g. re-running against a JSON you
+just hand-verified, or a project with no Makefile-based capture at all).
+
 Full pipeline, all in one pass over compile_commands.json:
 
   §4.2 Header inventory: cross-checks headers libclang actually included
@@ -39,12 +51,14 @@ Usage:
                           [--suppressions PATH] [--generate-suppressions PATH]
                           [--makefile PATH] [--no-header-inventory]
                           [--dump-declared] [--jobs N]
+                          [--skip-stale-check] [--make-cmd CMD]
 """
 
 import argparse
 import fnmatch
 import json
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -481,6 +495,164 @@ def check_directory_field(entries: list[dict], cc_path: Path) -> list[str]:
     return problems
 
 
+# ---------------------------------------------------------------------
+# §0 / §4.1.1 staleness gate -- ported from check_compile_commands_stale.py.
+# Read-only with respect to compile_commands.json, same as its standalone
+# ancestor: this only ever detects and reports a mismatch, never patches
+# or regenerates the file. Kept as a straight port rather than a shared
+# import so this file has no dependency on that one (they're deliberately
+# independent -- see conversation history for why).
+# ---------------------------------------------------------------------
+
+def run_make_dry_run(directory: Path, make_cmd: str) -> str:
+    """`make -B -n`: -B forces every rule to be considered out of date so
+    every compile command actually prints; -n means nothing is actually
+    built. Also surfaces recipe lines even if silenced with a leading
+    '@' in the Makefile."""
+    cmd = [make_cmd, "-B", "-n"]
+    try:
+        result = subprocess.run(
+            cmd, cwd=str(directory), capture_output=True, text=True, timeout=120
+        )
+    except FileNotFoundError:
+        sys.exit(
+            f"Could not run '{make_cmd}'. Is it on PATH? "
+            f"(try --make-cmd mingw32-make or similar)"
+        )
+    if result.returncode != 0:
+        print(f"warning: '{make_cmd} -B -n' exited {result.returncode}; "
+              f"proceeding with whatever it printed to stdout", file=sys.stderr)
+    return result.stdout
+
+
+def extract_make_compile_commands(dry_run_output: str) -> dict[str, list[str]]:
+    """Scan `make -Bn` output for compile-command lines and pull out
+    {source_file: raw_tokens}.
+
+    Deliberately does NOT filter by "does tokens[0] match a compiler
+    path already in compile_commands.json" -- that assumption breaks
+    whenever compile_commands.json is intentionally pointed at a
+    DIFFERENT compiler than the Makefile actually uses (e.g. a
+    clang-tidy-friendly compiler substituted in for header-resolution
+    reasons, per §4.1.1's "deliberately hand-tuned compiler-path entry"
+    carve-out -- this is Derell's actual setup: compile_commands.json
+    hardcodes a clang++ path for clang-tidy while the Makefile itself
+    may build with a different toolchain, e.g. tdm32 g++). Instead, a
+    line is recognized as a compile command purely structurally: it
+    contains -c, and exactly one token ends in a recognized source
+    extension. A link line has zero such tokens (only .o/.exe), so
+    this discriminates cleanly without needing to know the compiler's
+    identity up front."""
+    found: dict[str, list[str]] = {}
+    for line in dry_run_output.splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            tokens = shlex.split(stripped, posix=False)
+            tokens = [t[1:-1] if len(t) >= 2 and t[0] == t[-1] == '"' else t
+                      for t in tokens]
+        except ValueError:
+            continue  # unbalanced quotes etc -- not a compile line we can parse
+        if not tokens or "-c" not in tokens:
+            continue
+        source_tokens = [
+            t for t in tokens[1:]
+            if Path(t).suffix.lower() in SOURCE_EXTENSIONS
+        ]
+        if len(source_tokens) != 1:
+            continue  # 0: not a compile line (e.g. a link step). >1: ambiguous.
+        found[source_tokens[0]] = tokens
+    return found
+
+
+def normalize_make_flags(tokens: list[str], source_file: str) -> set[str]:
+    """Strip compiler exe, -c, -o <out>, and the source filename, leaving
+    just the real build-configuration flags for comparison. Order-
+    insensitive on purpose -- Makefile variable expansion can reorder
+    flags harmlessly."""
+    cleaned = []
+    skip_next = False
+    for i, tok in enumerate(tokens):
+        if skip_next:
+            skip_next = False
+            continue
+        if i == 0:
+            continue  # compiler exe -- exempted from drift-checking
+        if tok in DROP_FLAGS_NO_ARG:
+            continue
+        if tok in DROP_FLAGS_WITH_ARG:
+            skip_next = True
+            continue
+        if tok == source_file:
+            continue
+        cleaned.append(tok)
+    return set(cleaned)
+
+
+def check_compile_commands_stale(entries: list[dict], directory: Path, make_cmd: str) -> list[str]:
+    """The former check_compile_commands_stale.py's main comparison,
+    minus the directory-field check (that's handled separately by
+    check_directory_field, which runs first and gates this). Returns a
+    list of human-readable problem strings; empty means "matches"."""
+    json_by_file = {e["file"]: e for e in entries}
+
+    print(f"Checking compile_commands.json against '{make_cmd} -B -n' in {directory} ...")
+    dry_run_output = run_make_dry_run(directory, make_cmd)
+    makefile_by_file = extract_make_compile_commands(dry_run_output)
+
+    if not makefile_by_file:
+        dry_lines = [ln for ln in dry_run_output.splitlines() if ln.strip()]
+        print("No compile commands recognized in `make -B -n` output.", file=sys.stderr)
+        print("A line is recognized as a compile command if it contains "
+              "-c and exactly one token ends in a recognized source "
+              "extension (.c/.cpp/.cc/.cxx) -- unrelated to the compiler "
+              "path recorded in compile_commands.json. Diagnostics:",
+              file=sys.stderr)
+        print(f"  first {min(10, len(dry_lines))} non-blank line(s) of "
+              f"'{make_cmd} -B -n' output ({len(dry_lines)} total):", file=sys.stderr)
+        for ln in dry_lines[:10]:
+            print(f"    {ln!r}", file=sys.stderr)
+        if not dry_lines:
+            print("  (dry-run output was completely empty -- check that "
+                  f"'{make_cmd} -B -n' run manually in {directory} actually "
+                  "produces recipe lines for the default target)", file=sys.stderr)
+        sys.exit(1)
+
+    problems: list[str] = []
+
+    missing_from_json = sorted(set(makefile_by_file) - set(json_by_file))
+    for f in missing_from_json:
+        problems.append(f"MISSING FROM JSON: '{f}' is built by the Makefile "
+                         f"but has no entry in compile_commands.json")
+
+    stale_in_json = sorted(set(json_by_file) - set(makefile_by_file))
+    for f in stale_in_json:
+        entry = json_by_file[f]
+        full_path = Path(entry["directory"]) / f
+        if not full_path.exists():
+            problems.append(f"STALE ENTRY: '{f}' is in compile_commands.json but the "
+                             f"file no longer exists on disk ({full_path})")
+        else:
+            problems.append(f"STALE ENTRY: '{f}' is in compile_commands.json but the "
+                             f"Makefile no longer builds it")
+
+    for f in sorted(set(makefile_by_file) & set(json_by_file)):
+        makefile_flags = normalize_make_flags(makefile_by_file[f], f)
+        json_flags = normalize_make_flags(json_by_file[f]["arguments"], f)
+        added = makefile_flags - json_flags
+        removed = json_flags - makefile_flags
+        if added or removed:
+            detail = []
+            if added:
+                detail.append(f"Makefile has but JSON lacks: {sorted(added)}")
+            if removed:
+                detail.append(f"JSON has but Makefile lacks: {sorted(removed)}")
+            problems.append(f"FLAGS DIFFER for '{f}': " + "; ".join(detail))
+
+    return problems
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--compile-commands", default="compile_commands.json")
@@ -524,6 +696,17 @@ def main() -> None:
                      help="parallel worker processes (default: one per CPU "
                           "core). Use --jobs 1 to force sequential parsing, "
                           "e.g. for debugging a parse failure in isolation.")
+    ap.add_argument("--skip-stale-check", action="store_true",
+                     help="skip the §4.1.1 staleness gate (make -B -n vs "
+                          "compile_commands.json) that otherwise runs "
+                          "unconditionally before any parsing. Use for a "
+                          "JSON you've already hand-verified, or a project "
+                          "with no Makefile-based capture at all.")
+    ap.add_argument("--make-cmd", default="make",
+                     help="make executable to use for the staleness gate "
+                          "(default: make). Try mingw32-make etc. if "
+                          "that's what your toolchain provides. Ignored "
+                          "if --skip-stale-check is passed.")
     args = ap.parse_args()
 
     if args.libclang_path:
@@ -543,10 +726,22 @@ def main() -> None:
             print(f"  - {p}")
         print()
         print("Fix compile_commands.json's \"directory\" field(s) by hand, then re-run.")
-        print("(e.g. run check_compile_commands_stale.py, or edit directly)")
         sys.exit(1)
 
     project_dir = Path(entries[0]["directory"]).resolve()
+
+    if not args.skip_stale_check:
+        stale_problems = check_compile_commands_stale(entries, project_dir, args.make_cmd)
+        if stale_problems:
+            print(f"{len(stale_problems)} problem(s) found -- compile_commands.json is STALE:")
+            for p in stale_problems:
+                print(f"  - {p}")
+            print()
+            print("compile_commands.json was NOT modified. Update it by hand, then re-run.")
+            print("(or pass --skip-stale-check to bypass this gate)")
+            sys.exit(1)
+        print("compile_commands.json matches the Makefile -- proceeding.")
+        print()
 
     symbols: dict[str, dict] = {}
     headers_seen: set[str] = set()
