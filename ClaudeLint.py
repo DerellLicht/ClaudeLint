@@ -870,7 +870,7 @@ def main() -> None:
               f"{len(reported)} shown)")
     for s in reported:
         name = f"{s['enclosing']}::{s['name']}" if s["enclosing"] else s["name"]
-        print(f"{s['file']}:{s['line']}: unused {s['kind']} '{name}'")
+        print(f"{s['file']}:{s['line']}  # unused {s['kind']} '{name}'")
     if not reported:
         print("  none found.")
     else:
