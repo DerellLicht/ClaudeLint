@@ -399,6 +399,32 @@ def is_suppressed(sym: dict, suppressions: set[tuple[str, int]]) -> bool:
     return (str(Path(sym["file"]).resolve()), sym["line"]) in suppressions
 
 
+def ensure_default_suppressions(path: Path) -> None:
+    """First-run-in-a-new-project convenience: if the suppression file
+    doesn't exist yet, create an empty (but documented) one and say so
+    on screen. Without this, a fresh project has zero on-screen hint of
+    the suppression file's name/format the first time findings show up
+    -- the only way to remember it was to go check a different project.
+    Purely a convenience scaffold: an empty/comment-only suppression
+    file behaves identically to a missing one (see load_suppressions),
+    so this changes nothing about what gets reported, only whether the
+    file -- and a reminder of its format -- already exists to edit."""
+    if path.exists():
+        return
+    lines = [
+        "# ClaudeLint suppression file",
+        "# One entry per line: path/relative/to/project:line",
+        "# '#' starts a comment (full-line or trailing).",
+        "#",
+        "# Example (uncomment and edit to suppress a real finding):",
+        "# der_libs/common.h:101  # SomeStruct::some_field",
+        "",
+    ]
+    path.write_text("\n".join(lines) + "\n")
+    print(f"(no suppression file found -- created default: {path})")
+    print()
+
+
 def write_suppressions(path: Path, unused: list[dict], project_dir: Path) -> None:
     """--generate-suppressions: dump the CURRENT unused list as a ready-
     to-use suppression file -- the "yes, I know, leave it" baseline
@@ -730,6 +756,11 @@ def main() -> None:
 
     project_dir = Path(entries[0]["directory"]).resolve()
 
+    suppressions_path = Path(args.suppressions)
+    if not suppressions_path.is_absolute():
+        suppressions_path = project_dir / suppressions_path
+    ensure_default_suppressions(suppressions_path)
+
     if not args.skip_stale_check:
         stale_problems = check_compile_commands_stale(entries, project_dir, args.make_cmd)
         if stale_problems:
@@ -857,9 +888,6 @@ def main() -> None:
         print(f"Wrote {len(unused)} suppression entry(ies) to {out_path}")
         return
 
-    suppressions_path = Path(args.suppressions)
-    if not suppressions_path.is_absolute():
-        suppressions_path = project_dir / suppressions_path
     suppressions = load_suppressions(suppressions_path, project_dir)
     suppressed_count = sum(1 for s in unused if is_suppressed(s, suppressions))
     reported = [s for s in unused if not is_suppressed(s, suppressions)]
