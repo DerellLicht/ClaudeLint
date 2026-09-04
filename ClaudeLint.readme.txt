@@ -1,0 +1,407 @@
+ClaudeLint -- Usage & Troubleshooting Notes
+=============================================
+(Companion to ClaudeLint_Readme.md, which explains WHAT the tool checks
+and WHY. This file is the "what do I type / what does this error mean"
+quick reference for day-to-day use.)
+
+
+1. TYPICAL INVOCATION
+----------------------
+    python ClaudeLint.py --exclude der_libs
+
+Most projects only need --exclude der_libs. Add --strip-arg (see §3) if
+the project still builds with tdm32/GCC and compile_commands.json
+carries GCC-only flags.
+
+
+2. FULL OPTION REFERENCE
+--------------------------
+  --compile-commands PATH   Default: compile_commands.json
+  --libclang-path PATH      Default: D:\clang-22.1.8\bin\libclang.dll
+                             Must be version-matched to the REAL
+                             toolchain's own resource-dir headers (see
+                             §5 below). This is the parsing ENGINE, not
+                             the project's build compiler.
+  --target TRIPLE            Force one target triple for every entry,
+                             overriding auto-detection. Normally leave
+                             unset -- ClaudeLint auto-detects per entry
+                             via `<compiler> -dumpmachine`, so mixed
+                             32-/64-bit projects resolve correctly on
+                             their own. Only needed if that guess is
+                             wrong for your setup.
+  --makefile PATH            Default: Makefile. Used for the §4.2
+                             header-inventory cross-check only.
+  --exclude PATTERN          Directory prefix or glob to exclude from
+                             ALL harvesting/inventory (e.g. der_libs,
+                             der_libs/*, *.legacy.h). Repeatable. Use
+                             for code you don't own.
+  --strip-arg PATTERN        Glob matching a compiler ARGUMENT to drop
+                             before it's handed to the libclang parsing
+                             engine. Repeatable. See §3 -- this is the
+                             fix for "unknown warning option" spam.
+                             IMPORTANT: if PATTERN starts with a dash
+                             (almost always true for -W flags), you
+                             MUST use the --strip-arg=PATTERN form
+                             (with an "="), not a space, or argparse
+                             will misparse it as a separate flag and
+                             error with "expected one argument".
+  --extra-arg FLAG            The mirror image of --strip-arg: ADDS a
+                             compiler argument when parsing with
+                             libclang, without ever touching
+                             compile_commands.json. Repeatable. See §5
+                             -- for a flag the parsing ENGINE needs
+                             (e.g. -Wno-c++11-narrowing) that the REAL
+                             build compiler (e.g. GCC/tdm32) doesn't
+                             need/support and so shouldn't be added to
+                             the Makefile/JSON. Also see §6 -- same
+                             mechanism, used with -isystem<dir> to find
+                             a third-party header that's only sitting
+                             in one toolchain's include folder. Same
+                             "=" rule as --strip-arg applies for
+                             dash-leading values.
+  --no-header-inventory       Skip §4.2 entirely (only useful if the
+                             makedepend-block parser doesn't match your
+                             Makefile's format).
+  --suppressions PATH         Default: .claudelint-suppress. path:line
+                             entries, cppcheck-.suppress-style. Missing
+                             file = no suppressions, not an error.
+  --cppcheck-suppressions NAME Default: .suppress.cppcheck. Just the
+                             FILENAME cppcheck's own --suppressions-list
+                             expects to exist (cppcheck aborts if it's
+                             missing). ClaudeLint creates an empty one
+                             on startup if absent; the actual suppress
+                             entries inside it are cppcheck's own
+                             format, unrelated to ClaudeLint's.
+  --generate-suppressions PATH Instead of reporting, write the CURRENT
+                             unused-symbol list to PATH in suppression
+                             format and exit -- a ready-to-edit "yes I
+                             know, leave it" baseline.
+  --dump-declared              Print every declared field/global/local
+                             (used or not) -- for debugging the
+                             harvester itself, not normal use.
+  --why NAME                   Show every reference recorded for symbol
+                             NAME (bare name or Struct::field) instead
+                             of the normal report. First stop when a
+                             finding looks wrong in either direction.
+  --jobs N                     Parallel worker processes (default: one
+                             per CPU core). --jobs 1 forces sequential
+                             parsing -- use this to check whether a
+                             weird failure is real or a parallelism
+                             artifact.
+  --skip-stale-check           Skip the make -B -n vs compile_commands.
+                             json staleness gate that otherwise runs
+                             unconditionally first. Use for a JSON
+                             you've already hand-verified, or a project
+                             with no Makefile-based capture.
+  --make-cmd CMD                Default: make. Try mingw32-make etc. if
+                             that's what the project's toolchain uses.
+                             Ignored if --skip-stale-check is passed.
+
+
+3. "unknown warning option" SPAM (e.g. -Wno-stringop-truncation)
+-------------------------------------------------------------------
+CAUSE: compile_commands.json was captured from a project that still
+builds with GCC/tdm32 (or a different compiler family than the clang
+engine ClaudeLint parses with). Some -W flags are GCC-specific and
+clang's driver doesn't recognize them. Unlike a real diagnostic, this
+particular warning is printed by libclang's driver DIRECTLY to stderr,
+before tu.diagnostics is even wired up -- so it can't be filtered or
+counted after the fact the way real findings are; it has to be kept
+from reaching the engine in the first place.
+
+FIX: strip the offending flag(s) before they're handed to libclang:
+
+    python ClaudeLint.py --exclude der_libs \
+        --strip-arg=-Wno-stringop-truncation \
+        --strip-arg=-Wno-stringop-overflow
+
+or with a single glob covering the whole family:
+
+    python ClaudeLint.py --exclude der_libs --strip-arg=-Wno-stringop-*
+
+Remember the "=" (§2, --strip-arg) -- a space before a dash-leading
+value will misparse.
+
+This never touches compile_commands.json itself -- clang-tidy/cppcheck
+still see the real flags. It only changes what THIS run feeds its own
+parsing engine.
+
+
+4. "undeclared identifier 'GWL_WNDPROC'" / 'GCL_HCURSOR' / similar
+-----------------------------------------------------------------------
+CHECK THIS FIRST if the project is meant to be 32-bit: after running
+`compiledb make -B` to (re)generate compile_commands.json, the compiler
+entry it captures is whatever the Makefile actually invokes (e.g.
+d:\tdm32\bin\g++). If you then hand-edit that entry to point at the
+llvm/clang compiler instead (so clang-tidy resolves flags/headers the
+same way ClaudeLint does), it's easy to paste in the WRONG clang++ --
+e.g. copying the compiler line from a 64-bit project's
+compile_commands.json into a 32-bit one:
+
+    for 64-bit build: "d:/llvm/bin/x86_64-w64-mingw32-clang++",
+    for 32-bit build: "D:/llvm/bin/i686-w64-mingw32-clang++.exe",
+
+If the 64-bit path ends up in a 32-bit project's compile_commands.json,
+ClaudeLint's --dumpmachine auto-detection (§2, --target) faithfully
+asks THAT compiler what target it builds for, gets back
+x86_64-w64-mingw32, and parses accordingly -- which defines _WIN64 and
+makes GWL_WNDPROC genuinely vanish from the headers for this parse,
+even though the real tdm32 build is 32-bit and would never hit this at
+all. The run log's own
+    target (auto-detected via -dumpmachine):
+        <compiler path> -> <triple>
+line will show exactly which compiler and triple were used -- if the
+compiler path looks like the wrong architecture for the project, that's
+the bug, not the source code. Fix by correcting the compiler entry/entries
+in compile_commands.json to the matching-architecture clang++, then
+re-run.
+
+If the compiler path IS correct for the project's real architecture and
+this still shows up, then it's a genuine diagnostic worth looking at --
+see below.
+
+CAUSE (when the compiler path is correct and the project genuinely is
+64-bit): this is a REAL diagnostic (comes through tu.diagnostics
+normally, not a ClaudeLint quirk) -- and it's not actually about
+ClaudeLint or clang vs. GCC. It's the same error MSVC/any 64-bit build
+gives. mingui-w64's / the Windows SDK's own winuser.h defines the old
+GWL_*/GCL_* window/class "long" index constants unconditionally, then
+explicitly #undefs the pointer-sized ones under `#ifdef _WIN64`:
+
+    #define GWL_WNDPROC     (-4)
+    #define GWL_HINSTANCE   (-6)
+    #define GWL_HWNDPARENT  (-8)
+    #define GWL_USERDATA    (-21)
+    #ifdef _WIN64
+    #undef GWL_WNDPROC
+    #undef GWL_HINSTANCE
+    #undef GWL_HWNDPARENT
+    #undef GWL_USERDATA
+    #endif
+
+The reasoning: SetWindowLong()/GetWindowLong() and GetClassLong() only
+return a 32-bit LONG, which can't hold a 64-bit pointer (a WNDPROC
+address, an HCURSOR/HICON handle, etc). So on a 64-bit build those
+constants are removed entirely rather than silently truncating a
+pointer. This is why it only shows up now that wmetar/vlistview.cpp are
+being parsed with the 64-bit target (x86_64-w64-mingw32) -- the same
+source built fine under a 32-bit tdm32 target, where GWL_WNDPROC is
+still defined.
+
+FIX (the portable one, works on both 32- and 64-bit): use the pointer-
+safe GWLP_*/GCLP_* constants with the Ptr-suffixed functions instead:
+
+    GWL_WNDPROC    -> GWLP_WNDPROC    (with SetWindowLongPtr/GetWindowLongPtr)
+    GWL_HINSTANCE  -> GWLP_HINSTANCE
+    GWL_HWNDPARENT -> GWLP_HWNDPARENT
+    GWL_USERDATA   -> GWLP_USERDATA
+    GCL_HCURSOR    -> GCLP_HCURSOR    (with SetClassLongPtr/GetClassLongPtr)
+    GCL_HICON      -> GCLP_HICON
+    GCL_WNDPROC    -> GCLP_WNDPROC
+
+The GWLP_*/GCLP_* constants and *Ptr functions are defined on BOTH
+32- and 64-bit (on 32-bit they're plain macros aliasing the old
+functions), so switching to them is safe everywhere -- no #ifdef
+needed at the call site, unlike some other 32/64 portability issues in
+this codebase.
+
+NOTE: if the compiler path in compile_commands.json was correct (real
+64-bit project), this is a real fix to make in vlistview.cpp/wmetar.cpp
+themselves, not a ClaudeLint suppression -- ClaudeLint is correctly
+reporting a genuine compile error that would also hit a real 64-bit
+build with these compilers. If instead the compiler path turned out to
+be the wrong architecture (see the "CHECK THIS FIRST" note above), no
+code change is needed at all -- just fix compile_commands.json and
+re-run.
+
+  ! der_libs/vlistview.cpp: 2 diagnostic(s), e.g. use of undeclared identifier 'GWL_WNDPROC'
+  ! wmetar.cpp: 3 diagnostic(s), e.g. use of undeclared identifier 'GCL_HCURSOR'
+
+both point at this same root cause.
+
+
+5. "case value evaluates to N, which cannot be narrowed to type 'int'"
+   (WM_NOTIFY / notification submessage constants)
+-----------------------------------------------------------------------
+CANNOT be suppressed via .claudelint-suppress -- that file only covers
+§4.5 unused-symbol findings (path:line entries). This is a real
+libclang PARSE diagnostic (the "! file: N diagnostic(s)" line), raised
+before ClaudeLint's own unused-symbol analysis even starts, so there's
+nothing in the suppression-file category that reaches it.
+
+CAUSE: Windows notification/submessage constants are frequently defined
+as `(0U-317U)`-style macros -- a huge unsigned value (fine as UINT) that
+can't be represented in a `case` label matched against a signed `int`
+switch variable. C++11 made this ill-formed under narrowing-conversion
+rules for converted-constant-expressions, and Clang enforces it as a
+hard error ([-Wc++11-narrowing]) rather than a soft warning. This is
+the exact issue previously hit and fixed in the wFontList project.
+
+FIX -- PREFERRED, when the real build compiler for this project is
+GCC/tdm32 and doesn't need the flag at all: use --extra-arg to add it
+only to what ClaudeLint (and clang-tidy, if it's also pointed at this
+libclang) sees, without touching compile_commands.json or the Makefile:
+
+    python ClaudeLint.py --exclude der_libs --extra-arg=-Wno-c++11-narrowing
+
+DO NOT hand-add -Wno-c++11-narrowing directly into
+compile_commands.json's "arguments" array instead -- it'll sit there
+un-mirrored by the Makefile, and the very next `make clint` will fail
+the §0/§4.1.1 staleness gate with "FLAGS DIFFER ... JSON has but
+Makefile lacks: ['-Wno-c++11-narrowing']", since that check compares
+every argument except the compiler exe/-c/-o/source file. --extra-arg
+exists specifically to avoid this trap: it's applied at parse time,
+after everything from compile_commands.json, and never written
+anywhere the staleness gate looks.
+
+FIX -- ALTERNATIVE, if the project's real Clang build (not just
+ClaudeLint's analysis pass) should also carry this flag: add to the
+Makefile's CFLAGS:
+
+    CFLAGS += -Wno-c++11-narrowing
+
+NOT `-Wno-narrowing` -- that's the GCC spelling and clang won't
+recognize it. If the real build compiler is still GCC/tdm32, adding the
+CLANG spelling (-Wno-c++11-narrowing) to CFLAGS is safe: GCC silently
+ignores an unrecognized -Wno-* flag without failing the build. After
+adding it, re-run `compiledb make -B` (and redo the compiler-path swap
+to the matching-architecture clang++, per §4 above) so the flag lands
+in compile_commands.json for both the Makefile and the JSON together --
+no staleness conflict, since now both sides agree.
+
+Either way: don't rewrite the 5000-line legacy source to avoid the
+macro pattern -- -Wno-c++11-narrowing (via whichever of the two routes
+above fits how this project's real build should look) is the targeted,
+minimal fix, same as before.
+
+
+6. "'someheader.h' file not found" FOR A THIRD-PARTY / AFTER-MARKET
+   LIBRARY HEADER (e.g. libzplay.h)
+-----------------------------------------------------------------------
+CAUSE: ClaudeLint never uses the parsing engine's or the real build
+compiler's DEFAULT header search behavior -- per the Phase 0 recipe, it
+explicitly queries `<compiler> -E -v -x c++ ...` for that ONE compiler's
+own resolved -isystem dirs and feeds only those to libclang. So the
+question is never "is the header found by *some* compiler on this
+machine" -- it's "is the header found by the SPECIFIC compiler named in
+compile_commands.json's arguments[0] for this entry".
+
+This bites hardest when a third-party header has been manually copied
+into one toolchain's include folder (e.g. `d:\tdm32\include`) to make
+the real `make` build work, but compile_commands.json's entry for that
+file has been hand-edited to point at a DIFFERENT compiler (e.g. the
+llvm/clang++ swap from §4, done so clang-tidy/ClaudeLint resolve flags
+consistently). The header genuinely compiles fine under the real tdm32
+build -- it's sitting right there in tdm32's own include folder -- but
+the clang++ binary ClaudeLint is actually querying has its own,
+completely separate mingw sysroot that knows nothing about tdm32's
+folder at all. Angle brackets vs quotes (`<libzplay.h>` vs
+`"libzplay.h"`) makes no difference here -- that only changes SEARCH
+ORDER (quote-form checks the including file's own directory first),
+not whether the file needs to be found at all. Either form still fails
+the same way if the header isn't in ANY dir the queried compiler
+reports.
+
+FIX -- PREFERRED, when you don't want to duplicate the header into yet
+another toolchain's folder (a real headache every time you roll to a
+new toolchain, and doubly so for headers that only apply to one legacy
+project): point ClaudeLint's parsing engine at the extra folder
+directly with --extra-arg, WITHOUT touching compile_commands.json or
+copying anything:
+
+    python ClaudeLint.py --exclude der_libs --extra-arg=-isystemd:/tdm32/include
+
+Note there's no space and no second "=" between -isystem and the path
+-- that's clang's own flag syntax (-isystem<path>, one token), not an
+argparse quirk; the "=" that --extra-arg itself needs is only between
+--extra-arg and the whole flag value. This is exactly the same
+"engine-only, escape-hatch" use --extra-arg already covers for
+compiler warning flags (§5) -- it's not a new mechanism, just a
+different kind of argument being added at parse time only, so it never
+touches compile_commands.json and never risks the §0/§9 staleness gate.
+
+FIX -- ALTERNATIVE, if a proper shared home for the library already
+exists or is worth creating (e.g. the htmlhelp-style submodule pattern,
+bundling headers/.libs/.dlls together for reuse across projects): add
+that submodule's include dir the same way, or -I it into the Makefile
+so it's a real, tracked part of the build. Skip this for a single
+legacy repo still on tdm32 where standing the submodule up isn't worth
+it -- --extra-arg is the lighter-weight fix and doesn't commit you to
+restructuring anything.
+
+DO NOT copy the header into the llvm/clang toolchain's own include
+folder just to silence this -- that reintroduces the exact
+per-toolchain-copy maintenance burden --extra-arg exists to avoid, and
+it'll need repeating (and re-discovering) the next time either
+toolchain is reinstalled or upgraded.
+
+
+7. libclang ENGINE VERSION MISMATCH (import errors, "file not found"
+   for windows.h, or static_assert "requires Clang N or later")
+-----------------------------------------------------------------------
+See ClaudeLint_Readme.md's "A note on pip install libclang" section for
+the full story. Short version: the parsing ENGINE (--libclang-path) and
+its own resource-dir headers must be from the SAME build; the project's
+real sysroot headers (mingw's windows.h, libc++, etc) are queried live
+from the real compiler and don't need to match the engine's version.
+Don't try to fix a version mismatch by hand-copying headers around --
+install a matched standalone Clang instead.
+
+
+8. compile_commands.json "directory" FIELD MISMATCH
+------------------------------------------------------
+"DIRECTORY MISMATCH: compile_commands.json claims directory 'X', but
+the file itself is sitting in 'Y'" -- almost always means the project
+folder was copied to a new location (e.g. ndir32 -> ndir64) without
+regenerating compile_commands.json. ClaudeLint refuses to run rather
+than silently analyzing the OLD tree. Fix: regenerate
+compile_commands.json fresh in the new location (don't hand-edit the
+path -- every entry's `directory` and `file`/`arguments` need to agree
+with reality).
+
+
+9. compile_commands.json "STALE" (missing/extra entries, flags differ)
+---------------------------------------------------------------------
+ClaudeLint runs `make -B -n` and diffs it against compile_commands.json
+before doing anything else, and refuses to proceed on any mismatch
+(never auto-regenerates the file -- see ClaudeLint_Readme.md's
+directory-field note for why). Update compile_commands.json by hand to
+match, or pass --skip-stale-check if you've already verified it's fine
+and just want to move past the gate (e.g. no Makefile-based capture for
+this project).
+
+
+10. FILES ClaudeLint CREATES ON STARTUP (if missing)
+-------------------------------------------------------
+  .claudelint-suppress    Empty scaffold with format-note comments.
+  .suppress.cppcheck      Empty file, so cppcheck's own
+                          --suppressions-list doesn't abort for lack
+                          of a file to read.
+Neither is ever auto-populated with real entries -- that's what
+--generate-suppressions is for (§2), and it's a manual, deliberate step.
+
+
+11. QUICK DEBUGGING CHECKLIST
+--------------------------------
+  Finding looks wrong (used symbol flagged unused, or vice versa)?
+      --> --why 'Struct::field' (or bare name) shows every reference
+          recorded, ground-truth style.
+  Suspect the failure is a parallelism artifact?
+      --> --jobs 1 forces sequential parsing.
+  Want to see ALL declared symbols, not just unused ones?
+      --> --dump-declared
+  New project, want a baseline instead of triaging findings one by one?
+      --> --generate-suppressions .claudelint-suppress, then hand-edit.
+  Compiler diagnostic (narrowing, undeclared identifier, etc) rather
+  than a ClaudeLint unused-symbol finding?
+      --> Not suppressible via .claudelint-suppress. If the parsing
+          engine needs a flag the real build doesn't (§5), use
+          --extra-arg rather than hand-editing compile_commands.json --
+          the latter trips the staleness gate on the next run.
+          Otherwise the fix belongs in CFLAGS/the source, then
+          re-sync compile_commands.json.
+  "'x.h' file not found" for a third-party/after-market library header?
+      --> §6. Almost always the queried compiler for that
+          compile_commands.json entry has its own separate sysroot that
+          doesn't know about the folder you copied the header into.
+          --extra-arg=-isystem<dir> (no space, no copying) is the fix.

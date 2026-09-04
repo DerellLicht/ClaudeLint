@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Export Manifest Downloader</title>
+<style>
+  :root {
+    --bg: #1c1f24;
+    --panel: #262a31;
+    --border: #3a3f47;
+    --text: #e4e6ea;
+    --muted: #8b92a0;
+    --accent: #5b8def;
+    --accent-hover: #4a78d6;
+    --ok: #4caf7d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 48px 16px;
+  }
+  .wrap { width: 100%; max-width: 620px; }
+  h1 { font-size: 1.3rem; font-weight: 600; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 28px; font-size: 0.92rem; }
+
+  #drop {
+    border: 1.5px dashed var(--border);
+    border-radius: 10px;
+    padding: 36px 20px;
+    text-align: center;
+    color: var(--muted);
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  #drop.hover { border-color: var(--accent); background: rgba(91,141,239,0.06); }
+  #drop input { display: none; }
+  #drop .fname { color: var(--text); font-weight: 500; }
+
+  #panel {
+    margin-top: 24px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: none;
+  }
+  #panel h2 { font-size: 0.95rem; margin: 0 0 14px; color: var(--muted); font-weight: 500; }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .row:last-of-type { border-bottom: none; }
+  .row .name { font-size: 0.9rem; word-break: break-all; }
+  .row .status { font-size: 0.8rem; color: var(--muted); min-width: 64px; text-align: right; }
+  .row .status.done { color: var(--ok); }
+
+  button {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 7px;
+    padding: 10px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 18px;
+    width: 100%;
+  }
+  button:hover { background: var(--accent-hover); }
+  button:disabled { background: var(--border); color: var(--muted); cursor: default; }
+
+  #err {
+    display: none;
+    margin-top: 16px;
+    color: #e08080;
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <h1>Export Manifest Downloader</h1>
+  <p class="sub">Drop or select the <code>manifest-*.json</code> file from your export email. This finds every file link inside it and downloads them for you.</p>
+
+  <div id="drop">
+    <div>Drop <span class="fname">manifest-*.json</span> here, or click to choose it</div>
+    <input type="file" id="fileInput" accept=".json,application/json">
+  </div>
+
+  <div id="panel">
+    <h2 id="panelTitle">Files found</h2>
+    <p id="warnOnce" style="display:none; color:#d0a24c; font-size:0.82rem; margin:-6px 0 14px;">
+      Each of these links only works once — don't re-open this manifest and click "Download all" twice.
+    </p>
+    <div id="rows"></div>
+    <button id="downloadAllBtn">Download all</button>
+  </div>
+
+  <div id="err"></div>
+</div>
+
+<script>
+  /*
+   * Recursively walks an arbitrary parsed-JSON value looking for download
+   * links. Handles two shapes: (a) a bare string value that is itself a
+   * URL ending in an archive extension, and (b) an object that has a key
+   * matching /url/i (e.g. "export_url") whose value is an http(s) link —
+   * the export manifest does not put an extension on these, so the sibling
+   * "filename"/"name"/"label"/"title" field is used for the display name
+   * instead of trying to derive it from the URL. Results are pushed into
+   * `results` as {url, name} and de-duplicated by URL by the caller.
+   * Returns nothing; mutates `results` in place.
+   */
+  function findDownloadLinks(node, results)
+  {
+    const bareUrlPattern = /^https?:\/\/\S+\.(zip|tar\.gz|tgz)(\?\S*)?$/i;
+    const httpPattern = /^https?:\/\//i;
+
+    if (Array.isArray(node)) {
+      for (const item of node) {
+        findDownloadLinks(item, results);
+      }
+      return;
+    }
+
+    if (node !== null && typeof node === "object") {
+      const keys = Object.keys(node);
+      const urlKey = keys.find(k => /url/i.test(k) && typeof node[k] === "string" && httpPattern.test(node[k]));
+
+      if (urlKey) {
+        const nameKey = keys.find(k => /filename|^name$|label|title/i.test(k) && typeof node[k] === "string");
+        results.push({
+          url: node[urlKey],
+          name: nameKey ? node[nameKey] : urlFilename(node[urlKey])
+        });
+      }
+
+      for (const k of keys) {
+        findDownloadLinks(node[k], results);
+      }
+      return;
+    }
+
+    if (typeof node === "string" && bareUrlPattern.test(node)) {
+      results.push({ url: node, name: urlFilename(node) });
+    }
+  }
+
+  // Pulls a display filename off a URL's path, stripping any query string.
+  function urlFilename(url) {
+    const path = url.split("?")[0];
+    return path.substring(path.lastIndexOf("/") + 1) || url;
+  }
+
+  // De-duplicates a list of {url, name} entries by URL, keeping first seen.
+  function dedupe(entries)
+  {
+    const seen = new Set();
+    const out = [];
+    for (const e of entries) {
+      if (!seen.has(e.url)) {
+        seen.add(e.url);
+        out.push(e);
+      }
+    }
+    return out;
+  }
+
+  const dropEl = document.getElementById("drop");
+  const fileInputEl = document.getElementById("fileInput");
+  const panelEl = document.getElementById("panel");
+  const panelTitleEl = document.getElementById("panelTitle");
+  const rowsEl = document.getElementById("rows");
+  const downloadAllBtn = document.getElementById("downloadAllBtn");
+  const errEl = document.getElementById("err");
+  let currentFiles = [];
+
+  dropEl.addEventListener("click", () => fileInputEl.click());
+  dropEl.addEventListener("dragover", (e) => { e.preventDefault(); dropEl.classList.add("hover"); });
+  dropEl.addEventListener("dragleave", () => dropEl.classList.remove("hover"));
+  dropEl.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropEl.classList.remove("hover");
+    if (e.dataTransfer.files.length) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+  fileInputEl.addEventListener("change", () => {
+    if (fileInputEl.files.length) {
+      handleFile(fileInputEl.files[0]);
+    }
+  });
+
+  /*
+   * Reads the chosen manifest file, parses it as JSON, extracts every
+   * download link it can find, and renders the results panel. Any parse
+   * or "found nothing" failure is surfaced in the error box instead of
+   * failing silently.
+   */
+  function handleFile(file)
+  {
+    errEl.style.display = "none";
+    panelEl.style.display = "none";
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      let data;
+      try {
+        data = JSON.parse(reader.result);
+      } catch (parseErr) {
+        showError("That file isn't valid JSON:\n" + parseErr.message);
+        return;
+      }
+
+      const found = [];
+      findDownloadLinks(data, found);
+      currentFiles = dedupe(found);
+
+      const instructions = typeof data === "object" && data !== null ? data.instructions : null;
+      const singleUse = typeof instructions === "string" && /once/i.test(instructions);
+      document.getElementById("warnOnce").style.display = singleUse ? "block" : "none";
+
+      if (currentFiles.length === 0) {
+        showError("No .zip download links were found in this manifest.\n" +
+                   "The export format may have changed again — paste the raw " +
+                   "file contents back to me and I'll adjust the parser.");
+        return;
+      }
+
+      renderRows();
+    };
+    reader.onerror = () => showError("Could not read that file from disk.");
+    reader.readAsText(file);
+  }
+
+  function showError(msg)
+  {
+    errEl.textContent = msg;
+    errEl.style.display = "block";
+  }
+
+  // Builds the list of found files and resets each row's status label.
+  function renderRows()
+  {
+    panelTitleEl.textContent = currentFiles.length + " file" +
+      (currentFiles.length === 1 ? "" : "s") + " found";
+    rowsEl.innerHTML = "";
+
+    currentFiles.forEach((f, i) => {
+      const row = document.createElement("div");
+      row.className = "row";
+      row.innerHTML =
+        '<span class="name">' + escapeHtml(f.name) + '</span>' +
+        '<span class="status" id="status' + i + '">ready</span>' +
+        '<button class="rowBtn" data-idx="' + i + '" style="width:auto; margin:0; padding:5px 12px; font-size:0.8rem;">Open</button>';
+      rowsEl.appendChild(row);
+    });
+
+    rowsEl.querySelectorAll(".rowBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const idx = Number(btn.dataset.idx);
+        window.open(currentFiles[idx].url, "_blank", "noopener");
+        const statusEl = document.getElementById("status" + idx);
+        statusEl.textContent = "opened";
+        statusEl.classList.add("done");
+      });
+    });
+
+    downloadAllBtn.disabled = false;
+    downloadAllBtn.textContent = "Download all";
+    panelEl.style.display = "block";
+  }
+
+  function escapeHtml(s) {
+    const d = document.createElement("div");
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  /*
+   * Triggers a browser download/tab-open for every found file. These must
+   * all fire synchronously, inside this click handler, with no setTimeout
+   * or other async gap — Firefox-family browsers (Zen included) only treat
+   * a new-tab/download request as trusted if it happens within the same
+   * tick as the user's click. Anything opened from a timer callback loses
+   * that "user activation" and gets silently blocked as a popup, which is
+   * why only the first, undelayed file was going through before.
+   */
+  downloadAllBtn.addEventListener("click", () => {
+    downloadAllBtn.disabled = true;
+
+    currentFiles.forEach((f, i) => {
+      window.open(f.url, "_blank", "noopener");
+
+      const statusEl = document.getElementById("status" + i);
+      if (statusEl) {
+        statusEl.textContent = "opened";
+        statusEl.classList.add("done");
+      }
+    });
+
+    downloadAllBtn.textContent = "Done";
+  });
+</script>
+
+</body>
+</html>
