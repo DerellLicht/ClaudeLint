@@ -1,0 +1,480 @@
+myplaces_cleaned.kml
+
+Error in the document.
+• The element references an image 'http://topofusion.com/images/sym/Waypoint.png' that could not be fetched. This could be due to a temporary network issue, or the image may no longer be available or accessible.
+Unsupported element:"TimeStamp".
+Unsupported element:"gx:TimeSpan".
+Error in local style within a feature.
+• Feature name: New Spot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Plop Place
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: SRW STOP
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tg
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: THIRD SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: PT2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Cafe
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.oct.07.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tj
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-8
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Side View
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Derelict House
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-6
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: JANSPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: I WAS HERE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: POOCH KNEE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Vista Point 1A
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Th
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Temple Apse
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Hunting Hollow
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: SAFE SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: CoyoteHillNest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mowry Swamp 2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Overlook
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Old Falls Overlook
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NEWBEEHIVE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Spot3
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: FOURTHSPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: CHillsNest2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: VISTA PEAK
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Eagle Point
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Cherry Rapids
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tf
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: APEX4
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Alviso Parking
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Oak Babies
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nest Heads
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mill
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Better Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: THE TWINS
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Upper Seats
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: MY VISTA
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New Bee Hive
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nest 12.17.11
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: MY NEST
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Outlier
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Weibel Base
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New Vista
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Cave Overlook
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Deer Vetch
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NICE SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tf
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: DAY CAMP
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nest 04.27.12
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tc
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NOC Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: THIRD SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Vista Secrets
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: DRY MARSH
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tc
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mowry Spot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: AlkaliHeathBee
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Ridge Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: First Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: A Spot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: CAVE PEAK
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mating Trees
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Te
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NoNo Overlook
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: LeveeRest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Second Spot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Grasslands
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-7
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Totem Overlook
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: 1STCAVVIEW
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-3
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Vista Point Lo
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Lower
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: SUNOL MAIN
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: CAVE VIEW
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Where Am I??
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: HH Parking Lot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Td
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Th
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: TOTEMPERCH
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Furthest Point
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tg
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nest 08.19.12
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Meat Bees' Doom
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NEXT PASG
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Alviso Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\first spot exploring.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: First Stop
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: THE TEETH
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: CHAP BASE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: DIVERGENCE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\Sun Jul 29 2007b.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Backside
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Scotch Broom
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: FENCECROSS
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Weibel Base
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tb
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: ESCAPE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: VISTA4
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Ta
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: APEX4B
+• The element is referencing a style 'myplaces.kml#m_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tj
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: First Waterfall
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: NEW SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Vista Point
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: OLD SPOT
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Deadish Oak
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: First Spot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mswamp West
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: MSwamp NewSpot
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: wcr Nest110516
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Te
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tgiving Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Coyote Hills Spot1
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Td
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Coyote Hills Spot2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Tb
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-5
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: No Bees
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Weibel Base
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Platform2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Marsh Fork
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mswamp 021516
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: cave hunt.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: HH Nesting Site
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Cement Ruin
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: THE TWINS
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: 002
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: MS New Spot2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mswamp2 021516
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-1
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New Meadow
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: stump
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Mowry Spot2
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New Perch
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: FORESTVIEW
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\weibel.TheTwins.kml-4
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Prairie Forest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Nesting Tree
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Ta
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: 120Degs2HILL
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New Hunkering
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\fifth.spot.gps.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: C:\Program Files\TopoFusion\SunolRW 08.17.07.kml-0
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Save Passage
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Teeth Nest
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: HERE
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: VALLEYVIEW
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: New-Found Land
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.
+Error in local style within a feature.
+• Feature name: Retreat
+• The element is referencing a style 'm_ylw-pushpin_copy1' that does not exist.

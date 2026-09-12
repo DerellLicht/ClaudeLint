@@ -1,0 +1,77 @@
+Cleanup report for myplaces_in.kml
+============================================================
+
+Converted 52 gx:Track/gx:MultiTrack placemark(s) to LineString/MultiGeometry:
+  track->LineString: 'Alameda Creek 07.21.22'  [2022-07-21T18:59:11Z to 2022-07-21T19:29:51Z (83 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-05-27T20:06:45Z to 2012-05-27T20:26:47Z (84 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-08-06T21:47:43Z to 2011-08-06T22:25:09Z (102 points)]
+  track->LineString: 'ACTIVE LOG'  [2020-07-14T20:38:45Z to 2020-07-14T20:41:13Z (7 points)]
+  track->LineString: 'ACTIVE LOG'  [2018-09-04T18:47:54Z to 2018-09-04T18:50:02Z (10 points)]
+  track->LineString: 'ACTIVE LOG'  [2010-10-16T20:14:55Z to 2010-10-16T23:05:11Z (231 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-09-03T17:45:46Z to 2012-09-03T20:33:47Z (483 points)]
+  track->LineString: 'ACTIVE LOG'  [2008-09-28T20:22:26Z to 2008-09-29T00:18:12Z (267 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-11-27T00:50:55Z to 2011-11-27T01:33:18Z (169 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-12-31T22:19:36Z to 2012-01-01T01:06:11Z (66 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-04-21T21:48:24Z to 2012-04-21T22:01:50Z (62 points)]
+  track->LineString: 'Newark Area 4 Destruction'  [2014-09-02T02:13:29Z to 2014-09-02T02:19:59Z (68 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-10-22T21:26:54Z to 2011-10-22T21:39:54Z (41 points)]
+  multitrack->MultiGeometry (1 segments): 'Route from 2017-03-28 14:33'
+  track->LineString: 'ACTIVE LOG'  [2012-04-15T22:46:07Z to 2012-04-15T23:03:49Z (66 points)]
+  track->LineString: 'wcr 04.19.09.kml-0'  [2009-04-19T23:12:30Z to 2009-04-19T23:59:54Z (84 points)]
+  track->LineString: '6/10/2014 14:24'  [2014-06-10T21:24:39Z to 2014-06-10T21:50:21Z (74 points)]
+  track->LineString: 'wcr 10.08.11.kml-0'  [2011-10-08T21:39:05Z to 2011-10-08T22:10:34Z (111 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-08-20T17:44:36Z to 2011-08-20T18:29:11Z (96 points)]
+  track->LineString: 'wcr counter-vista 07/26/14'  [2014-07-26T17:35:48Z to 2014-07-26T17:48:23Z (50 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-07-22T18:08:02Z to 2012-07-22T18:37:12Z (43 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-10-29T23:24:22Z to 2011-10-30T00:05:13Z (122 points)]
+  track->LineString: 'ACTIVE LOG'  [2013-07-20T22:37:14Z to 2013-07-20T23:21:22Z (86 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-07-29T19:09:51Z to 2012-07-29T20:04:21Z (142 points)]
+  track->LineString: 'ACTIVE LOG'  [2012-02-03T18:05:09Z to 2012-02-03T21:11:33Z (69 points)]
+  track->LineString: 'wcr.08.23.15.kml-0'  [2015-08-24T00:08:30Z to 2015-08-24T00:58:40Z (121 points)]
+  track->LineString: 'wcr.08.30.15.kml-0'  [2015-08-30T22:03:33Z to 2015-08-30T22:34:21Z (82 points)]
+  track->LineString: 'wcr.first.spot.012608.kml-0'  [2008-01-26T20:54:40Z to 2008-01-26T21:32:42Z (87 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-09-02T17:10:38Z to 2011-09-02T23:19:02Z (207 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-11-22T23:47:43Z to 2011-11-23T00:02:11Z (61 points)]
+  track->LineString: 'ACTIVE LOG'  [2011-12-17T22:23:00Z to 2011-12-18T00:02:17Z (141 points)]
+  multitrack->MultiGeometry (1 segments): '1 Marshlands Rd'
+  multitrack->MultiGeometry (1 segments): 'Alameda Creek Trail'
+  multitrack->MultiGeometry (1 segments): 'Route from 2018-06-28 11:04'
+  multitrack->MultiGeometry (1 segments): 'Welch Creek Road 04.19.14'
+  track->LineString: 'Pelvis Gate descent'  [2021-06-01T23:15:40Z to 2021-06-01T23:35:13Z (11 points)]
+  track->LineString: 'Pelvis Gate Ascent'  [2021-06-01T17:33:41Z to 2021-06-01T18:04:45Z (31 points)]
+  track->LineString: '2022-04-27 16:13:15'  [2022-04-27T18:10:40Z to 2022-04-27T23:11:50Z (78 points)]
+  track->LineString: '30 APR 2022'  [2022-04-30T20:15:21Z to 2022-05-01T00:25:43Z (227 points)]
+  track->LineString: 'Coal Mine Canyon: 08.04.22'  [2022-08-04T17:38:39Z to 2022-08-04T23:12:43Z (237 points)]
+  track->LineString: 'Current Activity: 28 AUG 2022 13:20'  [2022-08-28T20:20:45Z to 2022-08-28T23:36:13Z (101 points)]
+  track->LineString: 'plant boundary'  [2022-11-07T21:31:24Z to 2022-11-07T21:45:34Z (47 points)]
+  track->LineString: '2023-03-01 15:48:52'  [2023-03-01T23:32:22Z to 2023-03-01T23:48:51Z (36 points)]
+  track->LineString: '2023-10-04 15:59:19'  [2023-10-04T22:24:42Z to 2023-10-04T22:59:15Z (89 points)]
+  track->LineString: 'Lower Altar route 10.11.23'  [2023-10-11T16:47:18Z to 2023-10-11T17:44:32Z (113 points)]
+  track->LineString: '2024-08-23 17:46:06'  [2024-08-23T19:05:45Z to 2024-08-24T00:46:06Z (228 points)]
+  track->LineString: '11/25/2014 wcr'  [2014-11-25T18:38:05.806Z to 2014-11-26T00:14:10.452Z (381 points)]
+  track->LineString: 'second spot legacy trail 10.09.24'  [2024-10-09T23:48:08Z to 2024-10-09T23:54:34Z (28 points)]
+  track->LineString: 'cave overview 06.17.25'  [2025-06-17T19:42:35Z to 2025-06-18T00:43:52Z (122 points)]
+  track->LineString: '2025-08-24 16:38:06'  [2025-08-24T22:00:37Z to 2025-08-24T23:38:05Z (47 points)]
+  track->LineString: 'wcr above first falls 05.01.26'  [2026-05-01T23:02:42Z to 2026-05-01T23:07:37Z (21 points)]
+  track->LineString: '2026-09-11 16:48:48'  [2026-09-11T23:02:42Z to 2026-09-11T23:16:57Z (50 points)]
+
+Normalized 21 altitudeMode value(s) to clampToGround. Original values seen: {'relativeToGround': 8, 'relativeToSeaFloor': 10, 'clampToSeaFloor': 3}
+
+Fixed 12 broken/local icon href(s), replaced with fallback pushpin icon.
+  icon fixed on 'IconStyle': was ':/camera_mode.png'
+  icon fixed on '(unknown)': was 'D:/photos/Mowry Swamp and region/Mowry Swamp 2021/stream hike 05.13.21/strange eyes.JPG'
+  icon fixed on 'IconStyle': was 'Calaveras_label.png'
+  icon fixed on 'IconStyle': was 'Concord_label.png'
+  icon fixed on 'IconStyle': was 'Greenville_label.png'
+  icon fixed on 'IconStyle': was 'Hayward_label.png'
+  icon fixed on 'IconStyle': was 'MtDiablo_label.png'
+  icon fixed on 'IconStyle': was 'Rodgers_label.png'
+  icon fixed on 'IconStyle': was 'SanAndreas_label.png'
+  icon fixed on 'IconStyle': was 'SanGregorio_label.png'
+  icon fixed on '(unknown)': was 'USGSlogo.png'
+  icon fixed on '(unknown)': was 'BayAreaFaults_Text.png'
+
+Flattened container tree: 109 session folder(s) under one root Document.
+Dropped 20 placemark(s) from excluded session(s): ['San Andreas & Bay Areas Faults']
+Placemark depth (# container ancestors) BEFORE flattening: {2: 7, 3: 313, 4: 68, 5: 1, 6: 78}
+Depth AFTER flattening: every placemark is now exactly 1 folder deep.
